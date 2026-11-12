@@ -18,7 +18,7 @@ Get all files from the **[latest release](../../releases/latest)**:
 | `Mjolnir-Sound-AddOn.zip` | Mjolnir's custom swing / impact / throw / recall / catch sounds | Recommended |
 | `Mjolnir-Updater.zip` | Re-applies Mjolnir after a game patch, and merges it with other mods that change weapons or text | Recommended |
 | `UE4SS-for-PBZ.zip` | UE4SS v3.0.1 set up for Phantom Blade Zero (the mod loader Mjolnir runs on) | Only if you don't have UE4SS yet |
-| `UE4SS-Signature-Fix-PBZ.zip` | Just the signature files (already inside `Mjolnir-Main.zip`) - for fixing UE4SS without reinstalling Mjolnir | Rarely |
+
 
 **Requirement:** UE4SS for Phantom Blade Zero. If you don't have it, use `UE4SS-for-PBZ.zip` from the release -
 it's the exact setup Mjolnir was built and tested on, including the game's UE4SS signatures.
