@@ -38,6 +38,7 @@ Already have UE4SS for Phantom Blade Zero from elsewhere? Keep it; Mjolnir works
 | --- | --- |
 | F9 | Give and equip Mjolnir |
 | F8 | Refresh Mjolnir's weapon menu if it looks wrong |
+| F7 | Remove Mjolnir from your inventory (equip another weapon first; use before uninstalling) |
 | L2 / LT | Throw (Asgardian Gale) |
 | L2 / LT again | Recall |
 
@@ -69,6 +70,10 @@ Open `platform\steam\ue4ss\UE4SS.log` after starting the game:
 If it still doesn't work, open an issue and attach your `UE4SS.log`.
 
 ## Uninstall
+1. **In game first:** equip another weapon, press **F7** (removes Mjolnir from your inventory), then save and quit.
+   This keeps your save from holding an item the game no longer knows.
+2. Then delete the files:
+
 Delete `ProjectPBZ\Content\Paks\~mods\zz_Mjolnir_P.*` and `zz_MjolnirApprovedAudio_P.*`,
 the folders `platform\steam\ue4ss\Mods\MjolnirMod` and `MjolnirApprovedAudio`, and `MjolnirUpdater`.
 If you installed UE4SS from `UE4SS-for-PBZ.zip` and want it gone too, delete `platform\steam\dwmapi.dll` and `platform\steam\ue4ss`.
