@@ -14,15 +14,21 @@ Get all files from the **[latest release](../../releases/latest)**:
 | `Mjolnir-Main.zip` | The mod: hammer, moves, throw/recall, glow, weapon menu entry | **Yes** |
 | `Mjolnir-Sound-AddOn.zip` | Mjolnir's custom swing / impact / throw / recall / catch sounds | Recommended |
 | `Mjolnir-Updater.zip` | Re-applies Mjolnir after a game patch, on your own PC | Recommended |
+| `UE4SS-for-PBZ.zip` | UE4SS v3.0.1 set up for Phantom Blade Zero (the mod loader Mjolnir runs on) | Only if you don't have UE4SS yet |
 
-**Requirement:** UE4SS for Phantom Blade Zero (the UE4SS build with Phantom Blade Zero's signatures, from Nexus Mods).
-Install it first: `dwmapi.dll` and the `ue4ss` folder go next to `PBZ.exe` in `platform\steam`.
-The sound add-on was built against UE4SS v3.0.1.
+**Requirement:** UE4SS for Phantom Blade Zero. If you don't have it, use `UE4SS-for-PBZ.zip` from the release -
+it's the exact setup Mjolnir was built and tested on, including the game's UE4SS signatures.
+Already have UE4SS for Phantom Blade Zero from elsewhere? Keep it; Mjolnir works with it
+(the sound add-on was built against UE4SS v3.0.1).
+
+> Why these files are here and not on Nexus Mods: Nexus automatically quarantines uploads that contain
+> programs or DLLs. The sound add-on, the updater and UE4SS all do, so they're hosted here with their source.
 
 ## Install
 1. Open the game's main folder (Steam: right-click Phantom Blade Zero > **Manage > Browse local files**).
    It contains `ProjectPBZ` and `platform`.
-2. Install UE4SS for Phantom Blade Zero if you don't have it.
+2. No UE4SS yet? Extract **UE4SS-for-PBZ.zip** into the game's main folder (merge folders).
+   You should end up with `platform\steam\dwmapi.dll` and `platform\steam\ue4ss\` next to `PBZ.exe`.
 3. Extract **Mjolnir-Main.zip** into the game's main folder (merge folders).
 4. Optional: extract **Mjolnir-Sound-AddOn.zip** and **Mjolnir-Updater.zip** there too.
 5. Start the game, load a level, press **F9**.
@@ -50,6 +56,7 @@ The first run downloads Epic's Oodle compression library from GitHub once.
 ## Uninstall
 Delete `ProjectPBZ\Content\Paks\~mods\zz_Mjolnir_P.*` and `zz_MjolnirApprovedAudio_P.*`,
 the folders `platform\steam\ue4ss\Mods\MjolnirMod` and `MjolnirApprovedAudio`, and `MjolnirUpdater`.
+If you installed UE4SS from `UE4SS-for-PBZ.zip` and want it gone too, delete `platform\steam\dwmapi.dll` and `platform\steam\ue4ss`.
 
 ## Source
 Every compiled file in the releases is built from this repository - see **[BUILDING.md](BUILDING.md)**:
@@ -57,4 +64,4 @@ Every compiled file in the releases is built from this repository - see **[BUILD
 `updater/` (PowerShell), `lua/` (the mod's UE4SS scripts).
 
 ## Credits
-UE4SS team · retoc by trumank (MIT) · UAssetAPI by atenfyr · CUE4Parse / FModel developers.
+UE4SS team (MIT, https://github.com/UE4SS-RE/RE-UE4SS) · retoc by trumank (MIT) · UAssetAPI by atenfyr · CUE4Parse / FModel developers.
