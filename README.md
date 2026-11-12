@@ -3,8 +3,11 @@
 A storm-forged war hammer for Phantom Blade Zero: its own moveset, a rune glow that lights up as you fight,
 custom sounds, and **Asgardian Gale** - throw the hammer, then snap your fingers to call it back.
 
-Everything here is free to use. You never have to wait for the author after a game patch:
-the **Mjolnir Updater** rebuilds the mod from your own copy of the game.
+Everything here is free to use. The **Mjolnir Updater** rebuilds the mod from your own copy of the game, so you never
+have to wait for the author after a game patch - and it merges Mjolnir with other mods that change weapons or text,
+so they keep working side by side.
+
+**Current version: 1.1.0** - see [What's new](#whats-new).
 
 ## Downloads
 Get all files from the **[latest release](../../releases/latest)**:
@@ -13,7 +16,7 @@ Get all files from the **[latest release](../../releases/latest)**:
 | --- | --- | --- |
 | `Mjolnir-Main.zip` | The mod: hammer, moves, throw/recall, glow, weapon menu entry | **Yes** |
 | `Mjolnir-Sound-AddOn.zip` | Mjolnir's custom swing / impact / throw / recall / catch sounds | Recommended |
-| `Mjolnir-Updater.zip` | Re-applies Mjolnir after a game patch, on your own PC | Recommended |
+| `Mjolnir-Updater.zip` | Re-applies Mjolnir after a game patch, and merges it with other mods that change weapons or text | Recommended |
 | `UE4SS-for-PBZ.zip` | UE4SS v3.0.1 set up for Phantom Blade Zero (the mod loader Mjolnir runs on) | Only if you don't have UE4SS yet |
 | `UE4SS-Signature-Fix-PBZ.zip` | Two text files that make an older UE4SS for Phantom Blade Zero work on the 4 Nov update | If you use UE4SS from elsewhere and Mjolnir does nothing |
 
@@ -24,6 +27,16 @@ Already have UE4SS for Phantom Blade Zero from elsewhere? Keep it; Mjolnir works
 
 > Why these files are here and not on Nexus Mods: Nexus automatically quarantines uploads that contain
 > programs or DLLs. The sound add-on, the updater and UE4SS all do, so they're hosted here with their source.
+
+## What's new
+**1.1.0**
+- Keys are now **F1** (give Mjolnir) and **F2** (refresh its menu entry) instead of F9/F8, which other mods use.
+  Keys can be changed in `settings.lua`.
+- The updater now **merges other mods** that change the weapon list or English text, instead of overwriting them,
+  and tells you which mods it merged (see [Compatibility](#compatibility-with-other-mods)).
+- `UE4SS-Signature-Fix-PBZ.zip` for players whose UE4SS predates the 4 Nov update, plus a Troubleshooting section.
+
+**1.0.0** - first release. Full list: [CHANGELOG.md](CHANGELOG.md).
 
 ## Install
 1. Open the game's main folder (Steam: right-click Phantom Blade Zero > **Manage > Browse local files**).
@@ -43,7 +56,7 @@ Already have UE4SS for Phantom Blade Zero from elsewhere? Keep it; Mjolnir works
 
 **Change the keys** in `platform\steam\ue4ss\Mods\MjolnirMod\Scripts\settings.lua` (open with Notepad). If another mod uses F1 or F2, pick another key there, or add `'CONTROL'` so Mjolnir's key only works with Ctrl held - UE4SS only fires a binding when exactly its modifier keys are held, so Ctrl+F1 never triggers another mod's F1.
 
-Mjolnir turns itself on with `enabled.txt` files; you don't need to edit `mods.txt`. It doesn't overwrite other mods.
+Mjolnir turns itself on with `enabled.txt` files; you don't need to edit `mods.txt`. Its own files never replace another mod's files; the four game files it shares with some mods are handled by the updater (see Compatibility).
 
 ## Compatibility with other mods
 Mjolnir adds itself to four game files: the weapon list (`DT_WeaponData`), the evolved-weapon text (`DT_WeaponSnapSoulText`),
@@ -70,7 +83,7 @@ use the same keys (see above).
 
 The updater reads the game's current weapon list and text from your installed game, adds Mjolnir to them,
 rebuilds `zz_Mjolnir_P`, and keeps the previous version in `MjolnirUpdater\backup`.
-"Already up to date" means the patch didn't touch Mjolnir's files.
+"Already up to date" means nothing Mjolnir depends on changed - neither the game nor your other mods.
 "UPDATE STOPPED" means the patch changed something it can't adapt to (or UE4SS needs an update) - your Mjolnir is left as it was.
 The first run downloads Epic's Oodle compression library from GitHub once.
 
