@@ -74,11 +74,19 @@ if(args[0]=="locres"){
             return 0;}
         case "dump":{foreach(var sp in lr.Spaces)foreach(var e in sp.Entries)if(args.Length<4||e.Key.Contains(args[3],StringComparison.OrdinalIgnoreCase)||e.Text.Contains(args[3],StringComparison.OrdinalIgnoreCase))Console.WriteLine($"[{sp.Name}] {e.Key} = {e.Text}");return 0;}
         case "roundtrip":{lr.Write(args[3]);bool same=File.ReadAllBytes(args[2]).SequenceEqual(File.ReadAllBytes(args[3]));Console.WriteLine(same?"byte-identical":"DIFFERS");return same?0:4;}
-        case "merge":{ // merge <stock> <out> <mod.locres> <key|prefix*>...: copy matching entries from the mod file
+        case "diff":{ // diff <base> <mod.locres> <out list>: keys the mod adds or changes (namespace|key per line)
+            var mod=Locres.Read(args[3]);var have=new Dictionary<string,string>();
+            foreach(var sp in lr.Spaces)foreach(var e in sp.Entries)have[sp.Name+"|"+e.Key]=e.Text;
+            var outl=new List<string>();
+            foreach(var sp in mod.Spaces)foreach(var e in sp.Entries)if(!have.TryGetValue(sp.Name+"|"+e.Key,out var t)||t!=e.Text)outl.Add(sp.Name+"|"+e.Key);
+            File.WriteAllLines(args[4],outl,new System.Text.UTF8Encoding(false));Console.WriteLine($"{outl.Count} text entr(ies) added or changed by the mod");return 0;}
+        case "merge":{ // merge <stock> <out> <mod.locres> <key|prefix*|@list>...: copy matching entries from the mod file
             var src=Locres.Read(args[4]);int n=0;
+            var exact=new HashSet<string>();var pats=new List<string>();
+            foreach(var a in args.Skip(5)){if(a.StartsWith('@')){foreach(var l in File.ReadAllLines(a[1..],System.Text.Encoding.UTF8))if(l.Length>0)exact.Add(l);}else pats.Add(a);}
             foreach(var sp in src.Spaces)foreach(var e in sp.Entries)
-                if(args.Skip(5).Any(p=>p.EndsWith('*')?e.Key.StartsWith(p[..^1],StringComparison.Ordinal):e.Key==p)){lr.Set(sp.Name,e.Key,e.Text);n++;}
-            if(n==0)throw new Exception("no matching entries in the mod language file");
+                if(exact.Contains(sp.Name+"|"+e.Key)||pats.Any(p=>p.EndsWith('*')?e.Key.StartsWith(p[..^1],StringComparison.Ordinal):e.Key==p)){lr.Set(sp.Name,e.Key,e.Text);n++;}
+            if(n==0&&exact.Count==0)throw new Exception("no matching entries in the mod language file");
             lr.Write(args[3]);var (ms,mk,mt)=lr.Check();Console.WriteLine($"merged {n} entries; wrote {mt} entries -> {args[3]}");return ms+mk==0?0:3;}
         case "set":{
             foreach(var spec in args.Skip(5)){
@@ -88,7 +96,7 @@ if(args[0]=="locres"){
             }
             lr.Write(args[3]);var (s,k,t)=lr.Check();Console.WriteLine($"wrote {t} entries -> {args[3]}");return s+k==0?0:3;}
     }
-    throw new Exception("locres: check|dump|roundtrip|set");
+    throw new Exception("locres: check|dump|roundtrip|set|diff|merge");
 }
 if(args[0]=="findprop"){
     // findprop <PropName>: the usmap classes/structs that declare a property of that name
@@ -107,6 +115,23 @@ var asset = new UAsset(args[1], EngineVersion.VER_UE5_7, usmap);
 
 switch (args[0])
 {
+    case "rowdiff":
+    {
+        // rowdiff <base table.uasset> <mod table.uasset> <out list.txt>: names of rows the mod adds or changes
+        static Dictionary<string, Newtonsoft.Json.Linq.JToken> Rows(UAsset a)
+        {
+            var j = Newtonsoft.Json.Linq.JObject.Parse(a.SerializeJson(false));
+            var d = new Dictionary<string, Newtonsoft.Json.Linq.JToken>();
+            foreach (var e in j["Exports"]!) { var data = e["Table"]?["Data"]; if (data == null) continue; foreach (var r in data) d[(string)r["Name"]!] = r; }
+            return d;
+        }
+        var modAsset = new UAsset(args[2], EngineVersion.VER_UE5_7, usmap);
+        var b = Rows(asset); var m = Rows(modAsset);
+        var changed = m.Where(kv => !b.TryGetValue(kv.Key, out var bv) || !Newtonsoft.Json.Linq.JToken.DeepEquals(bv, kv.Value)).Select(kv => kv.Key).ToList();
+        File.WriteAllLines(args[3], changed, new System.Text.UTF8Encoding(false));
+        Console.WriteLine($"{changed.Count} row(s) added or changed by the mod ({m.Count} rows in its table, {b.Count} in the game's)");
+        return 0;
+    }
     case "transplant":
     {
         // transplant <fresh table.uasset> <out.uasset> <mod table.uasset> <row|prefix*> [...]
@@ -121,9 +146,15 @@ switch (args[0])
         if (dstRows.Count > 0 && srcRows.Count > 0 && RowType(dstTable) != RowType(srcTable))
             throw new Exception($"row type changed: game {RowType(dstTable)}, mod {RowType(srcTable)}");
         var wanted = new List<StructPropertyData>();
-        foreach (var spec in args.Skip(4))
+        var specs = args.Skip(4).SelectMany(a => a.StartsWith('@')
+            ? File.ReadAllLines(a[1..], System.Text.Encoding.UTF8).Where(l => l.Length > 0).Select(l => "=" + l)
+            : new[] { a }).ToList();
+        if (specs.Count == 0) { Console.WriteLine("nothing to transplant"); if (Path.GetFullPath(args[1]) != Path.GetFullPath(args[2])) { File.Copy(args[1], args[2], true); File.Copy(Path.ChangeExtension(args[1], ".uexp"), Path.ChangeExtension(args[2], ".uexp"), true); } return 0; }
+        foreach (var spec0 in specs)
         {
-            var hit = spec.EndsWith('*')
+            bool exact = spec0.StartsWith('=');
+            var spec = exact ? spec0[1..] : spec0;
+            var hit = !exact && spec.EndsWith('*')
                 ? srcRows.Where(r => r.Name.ToString().StartsWith(spec[..^1], StringComparison.Ordinal)).ToList()
                 : srcRows.Where(r => r.Name.ToString() == spec).ToList();
             if (hit.Count == 0) throw new Exception($"mod table has no row matching {spec}");

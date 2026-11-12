@@ -25,8 +25,9 @@ Requires Visual Studio 2022+ (x64 Native Tools prompt):
 
 ## 2. PBZEdit.exe (updater tool)
 C# (.NET 10). Edits Unreal assets with UAssetAPI 1.1.0 and reads the game's files with CUE4Parse.
-The updater uses: `extract` (read Game.locres from the installed game), `transplant` (copy Mjolnir's rows
-into the game's current DataTables), `locres merge` (add Mjolnir's text entries). It needs `PBZ.usmap`
+The updater uses: `extract` (read Game.locres from the installed game), `rowdiff` / `locres diff` (find the rows and text
+entries another installed mod adds or changes), `transplant` (copy rows into the game's current DataTables) and
+`locres merge` (add text entries). It needs `PBZ.usmap`
 (the game's type mappings, dumped with UE4SS) next to the exe.
 
     dotnet publish pbzedit/PBZEdit.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=none
