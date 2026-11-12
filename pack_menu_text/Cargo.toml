@@ -1,0 +1,7 @@
+[package]
+name = "pack_menu_text"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+repak = { git = "https://github.com/trumank/repak.git", rev = "71d06644746134bd59ed1467bae1856704d2f8bb" }

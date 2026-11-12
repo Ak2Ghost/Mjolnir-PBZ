@@ -1,0 +1,8 @@
+bin/
+obj/
+target/
+*.exe
+*.dll
+*.lib
+*.obj
+*.exp

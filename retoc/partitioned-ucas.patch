@@ -1,0 +1,72 @@
+--- a/retoc/src/iostore.rs
++++ b/retoc/src/iostore.rs
+@@ -305,12 +305,44 @@
+     }
+ }
+ 
++/// Read+Seek over a container split into partitions (`name.ucas`, `name_s1.ucas`, ...).
++/// Block offsets in the TOC are global; partition N starts at N * partition_size.
++struct PartitionedCas<'a> {
++    pools: &'a [FilePool],
++    partition_size: u64,
++    pos: u64,
++}
++impl std::io::Read for PartitionedCas<'_> {
++    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
++        use std::io::{Seek, SeekFrom};
++        let (index, local) = if self.pools.len() <= 1 { (0, self.pos) } else { ((self.pos / self.partition_size) as usize, self.pos % self.partition_size) };
++        let pool = self.pools.get(index).ok_or_else(|| std::io::Error::new(std::io::ErrorKind::UnexpectedEof, format!("partition {index} does not exist")))?;
++        let max = if self.pools.len() <= 1 { buf.len() } else { buf.len().min((self.partition_size - local) as usize) };
++        let mut handle = pool.acquire()?;
++        let file = handle.file();
++        file.seek(SeekFrom::Start(local))?;
++        let n = std::io::Read::read(file, &mut buf[..max])?;
++        self.pos += n as u64;
++        Ok(n)
++    }
++}
++impl std::io::Seek for PartitionedCas<'_> {
++    fn seek(&mut self, pos: std::io::SeekFrom) -> std::io::Result<u64> {
++        match pos {
++            std::io::SeekFrom::Start(p) => self.pos = p,
++            std::io::SeekFrom::Current(d) => self.pos = self.pos.checked_add_signed(d).ok_or_else(|| std::io::Error::other("seek out of range"))?,
++            std::io::SeekFrom::End(_) => return Err(std::io::Error::other("SeekFrom::End is not supported on a partitioned container")),
++        }
++        Ok(self.pos)
++    }
++}
++
+ pub struct IoStoreContainer {
+     name: String,
+     #[allow(unused)]
+     path: PathBuf,
+     toc: Toc,
+-    cas: FilePool,
++    cas: Vec<FilePool>,
+ 
+     container_header: Option<FIoContainerHeader>,
+ }
+@@ -318,7 +350,11 @@
+     pub fn open<P: AsRef<Path>>(toc_path: P, config: Arc<Config>) -> Result<Self> {
+         let path = toc_path.as_ref().to_path_buf();
+         let toc: Toc = BufReader::new(fs::File::open(&path)?).de_ctx(config.clone())?;
+-        let cas = FilePool::new(path.with_extension("ucas"), rayon::max_num_threads())?;
++        let stem = path.file_stem().context("failed to get container name")?.to_string_lossy().to_string();
++        let mut cas = vec![FilePool::new(path.with_extension("ucas"), rayon::max_num_threads())?];
++        for index in 1..toc.partition_count.max(1) {
++            cas.push(FilePool::new(path.with_file_name(format!("{stem}_s{index}.ucas")), rayon::max_num_threads())?);
++        }
+ 
+         let mut container = Self {
+             name: path.file_stem().context("failed to get container name")?.to_string_lossy().into(),
+@@ -382,8 +418,8 @@
+     fn read(&self, chunk_id: FIoChunkId) -> Result<Vec<u8>> {
+         let chunk_id = chunk_id.with_version(self.toc.version);
+         let index = *self.toc.chunk_id_map.get(&chunk_id).with_context(|| format!("container {:?} does not contain {:?}", self.name, chunk_id))?;
+-        let mut file_lock = self.cas.acquire()?;
+-        self.toc.read(&mut file_lock.file(), index).with_context(|| format!("Failed to read chunk {chunk_id:?}"))
++        let mut cas = PartitionedCas { pools: &self.cas, partition_size: self.toc.partition_size, pos: 0 };
++        self.toc.read(&mut cas, index).with_context(|| format!("Failed to read chunk {chunk_id:?}"))
+     }
+     fn read_raw(&self, chunk_id_raw: FIoChunkIdRaw) -> Result<Vec<u8>> {
+         self.read(FIoChunkId::from_raw(chunk_id_raw, self.toc.version))
