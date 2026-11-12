@@ -14,16 +14,17 @@ Get all files from the **[latest release](../../releases/latest)**:
 
 | File | What it is | Needed? |
 | --- | --- | --- |
-| `Mjolnir-Main.zip` | The mod: hammer, moves, throw/recall, glow, weapon menu entry | **Yes** |
+| `Mjolnir-Main.zip` | The mod: hammer, moves, throw/recall, glow, weapon menu entry. Also includes UE4SS's signature files for the current game version | **Yes** |
 | `Mjolnir-Sound-AddOn.zip` | Mjolnir's custom swing / impact / throw / recall / catch sounds | Recommended |
 | `Mjolnir-Updater.zip` | Re-applies Mjolnir after a game patch, and merges it with other mods that change weapons or text | Recommended |
 | `UE4SS-for-PBZ.zip` | UE4SS v3.0.1 set up for Phantom Blade Zero (the mod loader Mjolnir runs on) | Only if you don't have UE4SS yet |
-| `UE4SS-Signature-Fix-PBZ.zip` | Two text files that make an older UE4SS for Phantom Blade Zero work on the 4 Nov update | If you use UE4SS from elsewhere and Mjolnir does nothing |
+| `UE4SS-Signature-Fix-PBZ.zip` | Just the signature files (already inside `Mjolnir-Main.zip`) - for fixing UE4SS without reinstalling Mjolnir | Rarely |
 
 **Requirement:** UE4SS for Phantom Blade Zero. If you don't have it, use `UE4SS-for-PBZ.zip` from the release -
 it's the exact setup Mjolnir was built and tested on, including the game's UE4SS signatures.
 Already have UE4SS for Phantom Blade Zero from elsewhere? Keep it; Mjolnir works with it
-(the sound add-on was built against UE4SS v3.0.1).
+(the sound add-on was built against UE4SS v3.0.1). `Mjolnir-Main.zip` includes UE4SS's signature files for the
+current game version (Steam build 26367565), so an older UE4SS for Phantom Blade Zero works after installing Mjolnir.
 
 > Why these files are here and not on Nexus Mods: Nexus automatically quarantines uploads that contain
 > programs or DLLs. The sound add-on, the updater and UE4SS all do, so they're hosted here with their source.
@@ -34,7 +35,8 @@ Already have UE4SS for Phantom Blade Zero from elsewhere? Keep it; Mjolnir works
   Keys can be changed in `settings.lua`.
 - The updater now **merges other mods** that change the weapon list or English text, instead of overwriting them,
   and tells you which mods it merged (see [Compatibility](#compatibility-with-other-mods)).
-- `UE4SS-Signature-Fix-PBZ.zip` for players whose UE4SS predates the 4 Nov update, plus a Troubleshooting section.
+- UE4SS's signature files for the 4 Nov game update are now **included in `Mjolnir-Main.zip`**, so an older UE4SS for
+  Phantom Blade Zero works after installing Mjolnir. Plus a Troubleshooting section.
 
 **1.0.0** - first release. Full list: [CHANGELOG.md](CHANGELOG.md).
 
@@ -94,7 +96,7 @@ Open `platform\steam\ue4ss\UE4SS.log` after starting the game:
 | What you see | Fix |
 | --- | --- |
 | No `UE4SS.log` at all | UE4SS isn't installed or isn't loading. Install `UE4SS-for-PBZ.zip`; `dwmapi.dll` must be in `platform\steam` next to `PBZ.exe`. On Steam Deck / Linux add launch option `WINEDLLOVERRIDES="dwmapi=n,b" %command%`. |
-| Log exists but no `Starting Lua mod 'MjolnirMod'`, or errors about GNatives / GUObjectArray | Your UE4SS signatures are from before the 4 Nov update. Install `UE4SS-Signature-Fix-PBZ.zip` (or `UE4SS-for-PBZ.zip`). |
+| Log exists but no `Starting Lua mod 'MjolnirMod'`, or errors about GNatives / GUObjectArray | Your UE4SS signatures are from before the 4 Nov update. Re-extract `Mjolnir-Main.zip` (it includes the fixed signatures), replacing files when asked. |
 | `[MjolnirMod] loaded` but F1 does nothing | Load into a level first (not the main menu), then press F1. The log line shows the keys in use; another mod may use the same key - change it in `settings.lua`. |
 | Hammer works but makes no custom sounds | Install `Mjolnir-Sound-AddOn.zip`. |
 | Mjolnir broke after a game update, or another mod's weapons/text disappeared | Run `MjolnirUpdater\Update Mjolnir.bat`. |
@@ -106,6 +108,7 @@ In game, equip a different weapon and save first. Then delete the files:
 
 Delete `ProjectPBZ\Content\Paks\~mods\zz_Mjolnir_P.*` and `zz_MjolnirApprovedAudio_P.*`,
 the folders `platform\steam\ue4ss\Mods\MjolnirMod` and `MjolnirApprovedAudio`, and `MjolnirUpdater`.
+Leave `platform\steam\ue4ss\UE4SS_Signatures` if you keep using UE4SS - other UE4SS mods need it on this game version too.
 If you installed UE4SS from `UE4SS-for-PBZ.zip` and want it gone too, delete `platform\steam\dwmapi.dll` and `platform\steam\ue4ss`.
 
 ## Source
