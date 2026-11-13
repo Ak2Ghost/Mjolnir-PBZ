@@ -1,5 +1,5 @@
 # Mjolnir updater: rebuilds Mjolnir's game package from YOUR installed copy of Phantom Blade Zero, so the mod
-# keeps working after a game patch.  Nothing is downloaded except, once, the Oodle library retoc needs.
+# keeps working after a game patch.  Nothing is downloaded except, once, the Oodle library (by this script, checksum-verified).
 #   -Force         rebuild even if the game's files look unchanged since the last update
 #   -OutDir <dir>  build only, into <dir>; do not install (for testing)
 param([switch]$Force, [string]$OutDir = '', [switch]$NoPause)
@@ -38,11 +38,27 @@ if (Get-Process -Name 'PBZ','PBZ-Win64-Shipping','ProjectPBZ-Win64-Shipping' -Er
 $key = (Get-Content (Join-Path $tools 'aes.txt') -Raw).Trim()
 New-Item -ItemType Directory -Force $work | Out-Null
 
+# 0. Oodle (the game's compression library, not shipped with the game as a file): fetched once by this
+#    script from the public OodleUE mirror retoc also uses, and only kept if its SHA-256 matches.
+#    (retoc then finds it and never downloads anything itself.)
+function Ensure-Oodle {
+  $want = '6f5d41a7892ea6b2db420f2458dad2f84a63901c9a93ce9497337b16c195f457'
+  if (Test-Path $oodle) { if ((Get-FileHash $oodle -Algorithm SHA256).Hash -eq $want) { return }; Remove-Item $oodle -Force }
+  $url = 'https://github.com/WorkingRobot/OodleUE/raw/refs/heads/main/Engine/Source/Programs/Shared/EpicGames.Oodle/Sdk/2.9.10/win/redist/oo2core_9_win64.dll'
+  Say "Downloading the Oodle library once (637 KB) from $url"
+  try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri $url -OutFile $oodle -UseBasicParsing }
+  catch { Fail "Could not download the Oodle library: $($_.Exception.Message). Check your internet connection and run the updater again." }
+  $got = (Get-FileHash $oodle -Algorithm SHA256).Hash
+  if ($got -ne $want) { Remove-Item $oodle -Force; Fail "The downloaded Oodle library did not match the expected checksum ($got) and was deleted. Nothing was changed." }
+  Say 'Oodle library verified.'
+}
+Ensure-Oodle
+
 # 1. Fresh copies of the game files Mjolnir adds to, straight from the installed game (never from ~mods).
 Say ''; Say '[1/5] Reading the game''s current files...'
 $fresh = Join-Path $work 'fresh'
 & $retoc --aes-key $key to-legacy --version UE5_7 --no-shaders -f '/DT_WeaponData.' -f '/DT_WeaponSnapSoulText.' -f '/DT_LocTable.' $paks $fresh
-Run 'Reading the game''s tables (if this mentions Oodle, check your internet connection once and try again)'
+Run 'Reading the game''s tables'
 $dt = Join-Path $fresh 'ProjectPBZ\Content\PBZContent\DataTable'
 $tables = [ordered]@{ 'UI\DT_WeaponData' = 'Mjolnir'; 'UI\DT_WeaponSnapSoulText' = 'Mjolnir'; 'Localizaion\DT_LocTable' = 'Mjolnir_*' }
 foreach ($t in $tables.Keys) { if (-not (Test-Path "$dt\$t.uasset")) { Fail "The game no longer has $t where Mjolnir expects it. This patch needs a new Mjolnir release." } }

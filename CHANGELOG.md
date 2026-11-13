@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+- **Sounds through the game's own Wwise engine.** Mjolnir's 61 sounds are cooked Wwise events (`zz_MjolnirWwise_P`),
+  posted by the Lua scripts. No DLL; the Sound Add-On (`MjolnirApprovedAudio`, `zz_MjolnirApprovedAudio_P`) is retired.
+- Mjolnir's weapon config holds the sound events, so the game keeps them loaded while the hammer is equipped
+  (no loading in combat, no stutter).
+- The flight sound fades with the hammer's distance (Mjolnir's own Wwise component volume); the throw impact plays at the hit
+  with Wwise distance attenuation.
+- Updater: PBZEdit is a normal .NET build (no self-extracting bundle); the Oodle library is downloaded by the script and
+  checked by SHA-256 (no tool downloads anything); `SHA256SUMS.txt` lists every file.
+- GitHub now hosts only the updater; `Mjolnir-Main.zip` is on Nexus Mods.
+
 ## 1.1.0
 - Keys changed to **F1** (give and equip Mjolnir) and **F2** (refresh its weapon-menu entry). F9/F8 clashed with other mods.
 - Keys are configurable in `MjolnirMod/Scripts/settings.lua`, including Ctrl/Shift/Alt combinations.

@@ -1,120 +1,85 @@
-# Mjolnir for Phantom Blade Zero
+# Mjolnir Updater for Phantom Blade Zero
 
-A storm-forged war hammer for Phantom Blade Zero: its own moveset, a rune glow that lights up as you fight,
-custom sounds, and **Asgardian Gale** - throw the hammer, then snap your fingers to call it back.
+The **Mjolnir Updater** keeps the Mjolnir mod working on your own, without waiting for the author:
 
-Everything here is free to use. The **Mjolnir Updater** rebuilds the mod from your own copy of the game, so you never
-have to wait for the author after a game patch - and it merges Mjolnir with other mods that change weapons or text,
-so they keep working side by side.
+- **After a game patch** it rebuilds Mjolnir from your installed copy of the game.
+- **With other mods** that change the weapon list or English text, it merges their changes with Mjolnir's
+  so both keep working.
 
-**Current version: 1.1.0** - see [What's new](#whats-new).
+The mod itself (`Mjolnir-Main.zip`) is on Nexus Mods. This repository hosts the updater and the source of
+everything the mod and updater contain.
 
-## Downloads
-Get all files from the **[latest release](../../releases/latest)**:
+**Current version: 1.2.0** - see [What's new](#whats-new).
 
-| File | What it is | Needed? |
-| --- | --- | --- |
-| `Mjolnir-Main.zip` | The mod: hammer, moves, throw/recall, glow, weapon menu entry. Also includes UE4SS's signature files for the current game version | **Yes** |
-| `Mjolnir-Sound-AddOn.zip` | Mjolnir's custom swing / impact / throw / recall / catch sounds | Recommended |
-| `Mjolnir-Updater.zip` | Re-applies Mjolnir after a game patch, and merges it with other mods that change weapons or text | Recommended |
-| `UE4SS-for-PBZ.zip` | UE4SS v3.0.1 set up for Phantom Blade Zero (the mod loader Mjolnir runs on) | Only if you don't have UE4SS yet |
+## Download
+**[Mjolnir-Updater.zip](../../releases/latest)** from the latest release.
 
-
-**Requirement:** UE4SS for Phantom Blade Zero. If you don't have it, use `UE4SS-for-PBZ.zip` from the release -
-it's the exact setup Mjolnir was built and tested on, including the game's UE4SS signatures.
-Already have UE4SS for Phantom Blade Zero from elsewhere? Keep it; Mjolnir works with it
-(the sound add-on was built against UE4SS v3.0.1). `Mjolnir-Main.zip` includes UE4SS's signature files for the
-current game version (Steam build 26367565), so an older UE4SS for Phantom Blade Zero works after installing Mjolnir.
-
-> Why these files are here and not on Nexus Mods: Nexus automatically quarantines uploads that contain
-> programs or DLLs. The sound add-on, the updater and UE4SS all do, so they're hosted here with their source.
-
-## What's new
-**1.1.0**
-- Keys are now **F1** (give Mjolnir) and **F2** (refresh its menu entry) instead of F9/F8, which other mods use.
-  Keys can be changed in `settings.lua`.
-- The updater now **merges other mods** that change the weapon list or English text, instead of overwriting them,
-  and tells you which mods it merged (see [Compatibility](#compatibility-with-other-mods)).
-- UE4SS's signature files for the 4 Nov game update are now **included in `Mjolnir-Main.zip`**, so an older UE4SS for
-  Phantom Blade Zero works after installing Mjolnir. Plus a Troubleshooting section.
-
-**1.0.0** - first release. Full list: [CHANGELOG.md](CHANGELOG.md).
+> Why it's here and not on Nexus Mods: Nexus automatically quarantines uploads that contain programs.
+> The updater needs three small tools (below), so it's hosted here with their source.
 
 ## Install
-1. Open the game's main folder (Steam: right-click Phantom Blade Zero > **Manage > Browse local files**).
-   It contains `ProjectPBZ` and `platform`.
-2. No UE4SS yet? Extract **UE4SS-for-PBZ.zip** into the game's main folder (merge folders).
-   You should end up with `platform\steam\dwmapi.dll` and `platform\steam\ue4ss\` next to `PBZ.exe`.
-3. Extract **Mjolnir-Main.zip** into the game's main folder (merge folders).
-4. Optional: extract **Mjolnir-Sound-AddOn.zip** and **Mjolnir-Updater.zip** there too.
-5. Start the game, load a level, press **F1**.
+1. Install Mjolnir first (`Mjolnir-Main.zip` from Nexus Mods).
+2. Extract **Mjolnir-Updater.zip** into the game's main folder (Steam: right-click Phantom Blade Zero >
+   **Manage > Browse local files**). You get a `MjolnirUpdater` folder next to `ProjectPBZ`.
 
-| Key | Action |
-| --- | --- |
-| F1 | Give and equip Mjolnir |
-| F2 | Refresh Mjolnir's weapon menu if it looks wrong |
-| L2 / LT | Throw (Asgardian Gale) |
-| L2 / LT again | Recall |
+## Use
+Close the game, then run **`MjolnirUpdater\Update Mjolnir.bat`**. Run it:
 
-**Change the keys** in `platform\steam\ue4ss\Mods\MjolnirMod\Scripts\settings.lua` (open with Notepad). If another mod uses F1 or F2, pick another key there, or add `'CONTROL'` so Mjolnir's key only works with Ctrl held - UE4SS only fires a binding when exactly its modifier keys are held, so Ctrl+F1 never triggers another mod's F1.
+- **after a game patch**, if Mjolnir stopped working;
+- **after installing, updating or removing a mod** that changes weapons or English text.
 
-Mjolnir turns itself on with `enabled.txt` files; you don't need to edit `mods.txt`. Its own files never replace another mod's files; the four game files it shares with some mods are handled by the updater (see Compatibility).
+It takes about a minute and ends with "Mjolnir is updated for this version of the game".
+"Already up to date" means nothing Mjolnir depends on changed. "UPDATE STOPPED" means the patch changed something
+the updater can't adapt to, and your Mjolnir is left as it was. The previous version is kept in `MjolnirUpdater\backup`.
 
-## Compatibility with other mods
-Mjolnir adds itself to four game files: the weapon list (`DT_WeaponData`), the evolved-weapon text (`DT_WeaponSnapSoulText`),
-the text table (`DT_LocTable`) and the English text (`Game.locres`). Unreal can't merge two mods that change the same file -
-the one that loads last wins. So if another mod also changes one of these (weapon balance, new weapons, text/translation mods):
+### What it does
+`tools\update_mjolnir.ps1` is plain PowerShell, so you can read it. It:
 
-1. Install **Mjolnir-Updater.zip**.
-2. Run **`MjolnirUpdater\Update Mjolnir.bat`** (game closed). It finds every installed mod that changes those files, works out
-   exactly which rows and text entries each one adds or changes, merges them all onto the game's current files, adds Mjolnir on
-   top, and lists the mods it merged.
-3. Run it again whenever you install, update or remove one of those mods.
+1. reads the weapon list (`DT_WeaponData`), evolved-weapon text (`DT_WeaponSnapSoulText`), text table (`DT_LocTable`) and
+   English text (`Game.locres`) from the game's own files (never from `~mods`);
+2. finds installed mods that change those files, and merges the rows and text entries each one adds or changes;
+3. adds Mjolnir on top, packs `zz_Mjolnir_P` and checks it;
+4. backs up the old files and installs the new ones into `ProjectPBZ\Content\Paks\~mods`.
 
-If the updater warns that a mod "loads after Mjolnir", rename that mod's `.pak/.utoc/.ucas` files so they sort before
-`zz_Mjolnir_P` (for example add `zy_` in front), then run the updater again.
+It writes nothing else.
 
-Mods that don't touch those files (graphics, camera/FOV, gameplay tweaks, boss changes) need nothing. Lua mods only clash if they
-use the same keys (see above).
+If it warns that a mod "loads after Mjolnir", rename that mod's `.pak/.utoc/.ucas` files so they sort before
+`zz_Mjolnir_P` (for example, add `zy_` in front), then run it again.
 
-## After a game patch
-1. Close the game.
-2. Open `MjolnirUpdater` in the game's main folder and run **Update Mjolnir.bat**.
-3. Wait for "Mjolnir is updated for this version of the game" (about a minute).
-   The same updater also merges Mjolnir with other installed mods (see Compatibility).
+### Network
+The first run downloads Epic's Oodle compression library (`oo2core_9_win64.dll`, 637 KB), which the game's files are compressed with.
+The **script** downloads it (not a tool) from the public OodleUE mirror and keeps it only if its SHA-256 is
+`6f5d41a7892ea6b2db420f2458dad2f84a63901c9a93ce9497337b16c195f457`. Nothing else is downloaded or sent.
 
-The updater reads the game's current weapon list and text from your installed game, adds Mjolnir to them,
-rebuilds `zz_Mjolnir_P`, and keeps the previous version in `MjolnirUpdater\backup`.
-"Already up to date" means nothing Mjolnir depends on changed - neither the game nor your other mods.
-"UPDATE STOPPED" means the patch changed something it can't adapt to (or UE4SS needs an update) - your Mjolnir is left as it was.
-The first run downloads Epic's Oodle compression library from GitHub once.
+### Checking the files
+`SHA256SUMS.txt` in the zip lists the SHA-256 of every file. The three tools are:
 
-## Troubleshooting
-Mjolnir needs **Phantom Blade Zero Steam build 26367565** (the 4 Nov 2026 update) and UE4SS that works on it.
-Open `platform\steam\ue4ss\UE4SS.log` after starting the game:
+| Tool | What it does | Source |
+| --- | --- | --- |
+| `tools\PBZEdit\PBZEdit.exe` (+ the .NET runtime's DLLs, signed by Microsoft) | reads and edits the game's tables and text | `pbzedit/` |
+| `tools\retoc\retoc-pbz.exe` | unpacks and repacks the game's IoStore containers | upstream retoc + `retoc/` patch |
+| `tools\pack_menu_text\pack_menu_text.exe` | packs Mjolnir's English text | `pack_menu_text/` |
 
-| What you see | Fix |
-| --- | --- |
-| No `UE4SS.log` at all | UE4SS isn't installed or isn't loading. Install `UE4SS-for-PBZ.zip`; `dwmapi.dll` must be in `platform\steam` next to `PBZ.exe`. On Steam Deck / Linux add launch option `WINEDLLOVERRIDES="dwmapi=n,b" %command%`. |
-| Log exists but no `Starting Lua mod 'MjolnirMod'`, or errors about GNatives / GUObjectArray | Your UE4SS signatures are from before the 4 Nov update. Re-extract `Mjolnir-Main.zip` (it includes the fixed signatures), replacing files when asked. |
-| `[MjolnirMod] loaded` but F1 does nothing | Load into a level first (not the main menu), then press F1. The log line shows the keys in use; another mod may use the same key - change it in `settings.lua`. |
-| Hammer works but makes no custom sounds | Install `Mjolnir-Sound-AddOn.zip`. |
-| Mjolnir broke after a game update, or another mod's weapons/text disappeared | Run `MjolnirUpdater\Update Mjolnir.bat`. |
+## What's new
+**1.2.0**
+- Mjolnir's sounds now play through the game's own Wwise sound engine, with no DLL.
+  The separate Sound Add-On is retired, and nothing in `Mjolnir-Main.zip` gets flagged.
+- The flight sound and the throw impact fade with distance.
+- The updater uses no self-extracting tool and no tool that downloads anything itself (see [Network](#network)),
+  and ships `SHA256SUMS.txt`.
 
-If it still doesn't work, open an issue and attach your `UE4SS.log`.
+Full list: [CHANGELOG.md](CHANGELOG.md).
+
+## Upgrading from 1.1
+Delete `ProjectPBZ\Content\Paks\~mods\zz_MjolnirApprovedAudio_P.*` and the folder `platform\steam\ue4ss\Mods\MjolnirApprovedAudio`
+(the old sound add-on), then install the new `Mjolnir-Main.zip` and this updater.
 
 ## Uninstall
-In game, equip a different weapon and save first. Then delete the files:
-
-Delete `ProjectPBZ\Content\Paks\~mods\zz_Mjolnir_P.*` and `zz_MjolnirApprovedAudio_P.*`,
-the folders `platform\steam\ue4ss\Mods\MjolnirMod` and `MjolnirApprovedAudio`, and `MjolnirUpdater`.
-Leave `platform\steam\ue4ss\UE4SS_Signatures` if you keep using UE4SS - other UE4SS mods need it on this game version too.
-If you installed UE4SS from `UE4SS-for-PBZ.zip` and want it gone too, delete `platform\steam\dwmapi.dll` and `platform\steam\ue4ss`.
+Delete the `MjolnirUpdater` folder. (To remove Mjolnir itself, see the readme in `Mjolnir-Main.zip`.)
 
 ## Source
-Every compiled file in the releases is built from this repository - see **[BUILDING.md](BUILDING.md)**:
-`audio/` (sound add-on, C++), `pbzedit/` (C#), `pack_menu_text/` (Rust), `retoc/` (patch for retoc),
-`updater/` (PowerShell), `lua/` (the mod's UE4SS scripts).
+See **[BUILDING.md](BUILDING.md)**: `pbzedit/` (C#), `pack_menu_text/` (Rust), `retoc/` (patch for retoc),
+`updater/` (PowerShell), `lua/` (Mjolnir's UE4SS scripts).
 
 ## Credits
-UE4SS team (MIT, https://github.com/UE4SS-RE/RE-UE4SS) · retoc by trumank (MIT) · UAssetAPI by atenfyr · CUE4Parse / FModel developers.
+UE4SS team (MIT, https://github.com/UE4SS-RE/RE-UE4SS) · retoc by trumank (MIT) · UAssetAPI by atenfyr · CUE4Parse / FModel developers · Audiokinetic Wwise.

@@ -81,11 +81,19 @@ RegisterHook('/Script/Engine.PlayerController:ClientRestart',function()
  local pc=UEHelpers.GetPlayerController()
  -- (Mjolnir's menu text ships in the mod's own English language file, not
  -- from a script: registering text from Lua crashed the game on 2026-11-06.)
- if pc and pc:IsValid()and pc.Pawn and pc.Pawn:IsValid()then start_runtime()end
+ if pc and pc:IsValid()and pc.Pawn and pc.Pawn:IsValid()then
+  start_runtime()
+  -- Mjolnir's sounds load here, at spawn, so combat never waits on a load.
+  Pump.post('audio_preload',function()require('attack_feedback').preload()end)
+ end
 end)
 log('loaded; controllers start when the player spawns; '..tostring(GIVE_KEY)..' gives Mjolnir, '..tostring(MENU_KEY)..' refreshes its menu (keys: settings.lua)')
 -- Also resume observers after UE4SS reloads scripts while the player is already in a level.
 if type(ExecuteInGameThread)=='function'then ExecuteInGameThread(function()
  local pc=UEHelpers.GetPlayerController()
- if pc and pc:IsValid()and pc.Pawn and pc.Pawn:IsValid()then start_runtime()end
+ if pc and pc:IsValid()and pc.Pawn and pc.Pawn:IsValid()then
+  start_runtime()
+  -- Mjolnir's sounds load here, at spawn, so combat never waits on a load.
+  Pump.post('audio_preload',function()require('attack_feedback').preload()end)
+ end
 end)end
