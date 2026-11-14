@@ -9,7 +9,7 @@ The **Mjolnir Updater** keeps the Mjolnir mod working on your own, without waiti
 The mod itself (`Mjolnir-Main.zip`) is on Nexus Mods. This repository hosts the updater and the source of
 everything the mod and updater contain.
 
-**Current version: 1.2.0** - see [What's new](#whats-new).
+**Current version: 1.2.1** - see [What's new](#whats-new).
 
 ## Download
 **[Mjolnir-Updater.zip](../../releases/latest)** from the latest release.
@@ -61,6 +61,10 @@ The **script** downloads it (not a tool) from the public OodleUE mirror and keep
 | `tools\pack_menu_text\pack_menu_text.exe` | packs Mjolnir's English text | `pack_menu_text/` |
 
 ## What's new
+**1.2.1**
+- New **F3** key: removes Mjolnir from your weapons before you uninstall, so the save isn't left with an
+  empty weapon slot. The updater is unchanged.
+
 **1.2.0**
 - Mjolnir's sounds now play through the game's own Wwise sound engine, with no DLL.
   The separate Sound Add-On is retired, and nothing in `Mjolnir-Main.zip` gets flagged.
@@ -75,7 +79,11 @@ Delete `ProjectPBZ\Content\Paks\~mods\zz_MjolnirApprovedAudio_P.*` and the folde
 (the old sound add-on), then install the new `Mjolnir-Main.zip` and this updater.
 
 ## Uninstall
-Delete the `MjolnirUpdater` folder. (To remove Mjolnir itself, see the readme in `Mjolnir-Main.zip`.)
+Delete the `MjolnirUpdater` folder.
+
+To remove Mjolnir itself: in game, switch to another weapon and press **F3** (Mjolnir leaves your weapons),
+rest at a shrine so the game saves, quit, then delete `zz_Mjolnir_P.*`, `zz_MjolnirWwise_P.*` and the
+`MjolnirMod` folder. Already deleted it and have an empty weapon slot? Install Mjolnir again and do the same.
 
 ## Source
 See **[BUILDING.md](BUILDING.md)**: `pbzedit/` (C#), `pack_menu_text/` (Rust), `retoc/` (patch for retoc),

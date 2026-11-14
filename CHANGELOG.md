@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+- **F3 removes Mjolnir before uninstalling.** Deleting the mod while Mjolnir was still owned left an empty slot in the
+  weapon list, because the save keeps the weapon's ID. F3 (with another weapon in hand) takes Mjolnir's entry out of the
+  backpack's `Inventories` and `MainWeaponInfos` maps and checks the result with the game's `HasWeapon`. The game's own
+  `RemoveWeaponByID` leaves both maps untouched, so it isn't relied on. Key configurable as `remove` in `settings.lua`.
+
 ## 1.2.0
 - **Sounds through the game's own Wwise engine.** Mjolnir's 61 sounds are cooked Wwise events (`zz_MjolnirWwise_P`),
   posted by the Lua scripts. No DLL; the Sound Add-On (`MjolnirApprovedAudio`, `zz_MjolnirApprovedAudio_P`) is retired.
