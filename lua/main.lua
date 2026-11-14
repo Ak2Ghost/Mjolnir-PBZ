@@ -1,6 +1,7 @@
 -- MjolnirMod: the Mjolnir weapon for Hun.
 --   F1 give Mjolnir and equip it
 --   F2 check the weapon menu's copy of Mjolnir; refresh it if stale
+--   F3 remove Mjolnir from your weapons (do this before uninstalling)
 -- Keys are set in settings.lua (next to this file).
 -- The hammer's own controllers (combo sound, throw and return) start once
 -- the player is in the world.  Everything logs to UE4SS.log as [MjolnirMod].
@@ -12,7 +13,7 @@ local ITEM_ID='Mjolnir'
 local function log(msg)print('[MjolnirMod] '..msg..'\n')end
 
 -- Key bindings come from settings.lua; a broken entry falls back to the default.
-local DEFAULTS={give={key='F1',modifiers={}},menu={key='F2',modifiers={}}}
+local DEFAULTS={give={key='F1',modifiers={}},menu={key='F2',modifiers={}},remove={key='F3',modifiers={}}}
 local okSettings,SETTINGS=pcall(require,'settings')
 if not okSettings or type(SETTINGS)~='table'then log('settings.lua not readable ('..tostring(SETTINGS)..'); using default keys');SETTINGS={}end
 local function describe(b)local parts={};for _,m in ipairs(b.modifiers or{})do parts[#parts+1]=m end;parts[#parts+1]=b.key;return table.concat(parts,'+')end
@@ -76,6 +77,12 @@ local MENU_KEY=bind('menu',function()Pump.post('menu_check',function()
  log('menu: '..(ok and tostring(r)or('check failed: '..tostring(r))))
 end)end)
 
+-- F3: take Mjolnir out of the backpack before uninstalling (remove_mjolnir.lua).
+local REMOVE_KEY=bind('remove',function()Pump.post('remove_mjolnir',function()
+ local ok,r=pcall(function()return require('remove_mjolnir').run(log)end)
+ if not ok then log('remove: failed: '..tostring(r))end
+end)end)
+
 -- ClientRestart: the player is in the world.
 RegisterHook('/Script/Engine.PlayerController:ClientRestart',function()
  local pc=UEHelpers.GetPlayerController()
@@ -87,7 +94,7 @@ RegisterHook('/Script/Engine.PlayerController:ClientRestart',function()
   Pump.post('audio_preload',function()require('attack_feedback').preload()end)
  end
 end)
-log('loaded; controllers start when the player spawns; '..tostring(GIVE_KEY)..' gives Mjolnir, '..tostring(MENU_KEY)..' refreshes its menu (keys: settings.lua)')
+log('loaded; controllers start when the player spawns; '..tostring(GIVE_KEY)..' gives Mjolnir, '..tostring(MENU_KEY)..' refreshes its menu, '..tostring(REMOVE_KEY)..' removes it before uninstalling (keys: settings.lua)')
 -- Also resume observers after UE4SS reloads scripts while the player is already in a level.
 if type(ExecuteInGameThread)=='function'then ExecuteInGameThread(function()
  local pc=UEHelpers.GetPlayerController()

@@ -6,4 +6,5 @@
 return {
  give    = { key = 'F1', modifiers = {} },  -- give + equip Mjolnir
  menu    = { key = 'F2', modifiers = {} },  -- refresh Mjolnir's weapon menu entry
+ remove  = { key = 'F3', modifiers = {} },  -- remove Mjolnir from your weapons (do this before uninstalling)
 }
